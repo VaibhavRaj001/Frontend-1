@@ -51,7 +51,7 @@ const App = () => {
   const analyzeReviews = async (collectedReviews) => {
     setLoading(true);
     try {
-      const response = await axios.post("https://backend-hk4h.vercel.app/visualize/", {
+      const response = await axios.post("https://backend-4-8fik.onrender.com/visualize/", {
         texts: collectedReviews,
       });
 
