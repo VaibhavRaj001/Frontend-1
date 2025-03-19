@@ -66,6 +66,19 @@ const App = () => {
     setLoading(false);
   };
 
+  // Function to go back to the previous stage
+  const handleGoBack = () => {
+    if (stage === "collectReviews") {
+      setStage("askNumber");
+      setReviews([]);
+      setNumReviews("");
+      setCurrentReviewIndex(0);
+    } else if (stage === "displayResults") {
+      setStage("collectReviews");
+      setCurrentReviewIndex(0);
+    }
+  };
+
   return (
     <motion.div className="app-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }}>
       <div className="content-container">
@@ -95,13 +108,42 @@ const App = () => {
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
             />
-            <motion.button whileHover={{ scale: 1.1 }} className="submit-button" onClick={handleReviewSubmit}>
-              {currentReviewIndex + 1 < reviews.length ? "Next Review ➡️" : "Analyze Reviews"}
-            </motion.button>
+
+            {/* Buttons Container for Back and Next */}
+            <div className="button-container">
+              {/* Back to Previous Review Button */}
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                className="prev-button"
+                onClick={() => {
+                  if (currentReviewIndex > 0) {
+                    setCurrentReviewIndex(currentReviewIndex - 1);
+                    setReviewText(reviews[currentReviewIndex - 1] || ""); // Load previous review
+                  }
+                }}
+                disabled={currentReviewIndex === 0} // Disable on first review
+              >
+                ⬅️ Previous
+              </motion.button>
+
+              {/* Next Review / Analyze Button */}
+              <motion.button whileHover={{ scale: 1.1 }} className="submit-button" onClick={handleReviewSubmit}>
+                {currentReviewIndex + 1 < reviews.length ? "Next ➡️" : "Analyze Reviews"}
+              </motion.button>
+            </div>
           </motion.div>
         )}
 
-        {stage === "displayResults" && (
+
+        {/* Show loading spinner while waiting for results */}
+        {loading && (
+          <motion.div className="loading-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <div className="spinner"></div>
+            <p>Analyzing Reviews...</p>
+          </motion.div>
+        )}
+
+        {stage === "displayResults" && !loading && (
           <>
             <motion.h2>📊 Sentiment Analysis Results</motion.h2>
             <div className="results-container">
@@ -141,6 +183,10 @@ const App = () => {
               This heat map shows the distribution of different reviews vs imdb rating along with the confidence sentiment score, while the pie chart
               shows the distribution of overall sentiment categories.
             </p>
+
+            <motion.button whileHover={{ scale: 1.1 }} className="back-button" onClick={handleGoBack}>
+              ⬅️ Go Back
+            </motion.button>
 
             {/* Fullscreen Modal */}
             {modalImage && (
